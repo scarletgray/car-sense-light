@@ -1,0 +1,18 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:\\Users\\escarletg\\OneDrive - SCEGGS DARLINGHURST\\Arduino\\tools\\**",
+                "C:\\Users\\escarletg\\OneDrive - SCEGGS DARLINGHURST\\Arduino\\hardware\\arduino\\avr\\**",
+                "C:\\Users\\escarletg\\AppData\\Local\\Arduino15\\packages\\esp8266\\tools\\**",
+                "C:\\Users\\escarletg\\AppData\\Local\\Arduino15\\packages\\esp8266\\hardware\\esp8266\\2.5.0\\**"
+            ],
+            "forcedInclude": [
+                "C:\\Users\\escarletg\\OneDrive - SCEGGS DARLINGHURST\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
+            ],
+            "intelliSenseMode": "msvc-x64"
+        }
+    ],
+    "version": 4
+}
