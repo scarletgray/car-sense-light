@@ -2,11 +2,16 @@
 #include <Arduino.h>
 
 //int PI = 3.14159265; //may try later with actual set pi from library --> M_PI
-float DEG_2_RAD = 180/M_PI; //Conversion from degrees to radians, divide degrees by this
+float convertDegreesToRadian(float degrees){
+    return degrees* 180 /M_PI;
+}
+
+float DEG_2_RAD =
+    180 / M_PI;  // Conversion from degrees to radians, divide degrees by this
 
 //For testing purposes without transceivers, will set transmitter as centre of Lyne park dog field (-33.870768,151.264239)
 float LAT_TX1_RAD = -33.870768/DEG_2_RAD;         //GPS.latitudeDegreesTx/DEG_2_RAD //for testing input values this is from the trasmitting rider
-float LONG_TX1_RAD = 151.264239/DEG_2_RAD;        //GPS.longitudeDegreesTx/DEG_2_RAD  
+float LONG_TX1_RAD = 151.264239/DEG_2_RAD;        //GPS.lonzgitudeDegreesTx/DEG_2_RAD  
 float HEAD_TX1_RAD = (40/DEG_2_RAD)+ 2*M_PI; //Transmitter heading - preset values for testing purposes //adding 2Pi to remove -tve values and values outside range
 
 //For testing purposes, using another point in Lyne park (-33.870162,151.264249)
@@ -22,15 +27,18 @@ float C = 2*atan2f(sqrtf(A),sqrtf(1-A));
 float D = R*C;
 
 void setup() {
-  // put your setup code here, to run once:
-Serial.begin (9600) ;
-
+    Serial.begin (9600) ;
 }
-// comment added
+
 void loop() {
-  // put your main code here, to run repeatedly:
-Serial.print("--> Distance value =");   //problem atm
-Serial.print(D);
-Serial.println(", ");
-delay(100);
+    // put your main code here, to run repeatedly:
+    Serial.print("Dist = ");
+    Serial.println(D);
+    Serial.print("Aqunatuty = ");
+    Serial.println(A);
+    Serial.print("something = ");
+    Serial.println(C);
+    Serial.println();
+
+    delay(100);
 }
