@@ -5,7 +5,7 @@
 
 // _______ FUNCTIONAL PROTOTYPES _________
 // Functional Prototypes appear in the file where the code is
-// but at the front so that the compiler can make 
+// but at the front so that the compiler can make
 // placeholders for all the functions it will need
 double convertDegreesToRadian(double);
 void setupSerial();
@@ -15,36 +15,37 @@ void setupAccelerometer();
 double calculateRiderGap(Rider, Rider);
 void read_sensors_to_get_self();
 void read_other_bike_positions();
+void update_output(int, double);
 
-    // _______ GLOBAL VARIABLES _________
-    // Global variables are ones you want to be able to use through every
-    // function. There should only ever need to be a few
-    Rider self;
-    Rider peloton[MAX_PELOTON];
+// _______ GLOBAL VARIABLES _________
+// Global variables are ones you want to be able to use through every
+// function. There should only ever need to be a few
+Rider self;
+Rider peloton[MAX_PELOTON];
 
-    // This chunk of information about a single
-    // riders details should be wrapped into an struct (in main.h)
-    double lat_tx1_rad = convertDegreesToRadian(-33.870768);
-    double long_tx1_rad = convertDegreesToRadian(151.264239);
-    // This is another riders position defined as the same struct type
-    double lat_me_rad = convertDegreesToRadian(-33.870162);
-    double long_me_rad = convertDegreesToRadian(151.264249);
+// This chunk of information about a single
+// riders details should be wrapped into an struct (in main.h)
+double lat_tx1_rad = convertDegreesToRadian(-33.870768);
+double long_tx1_rad = convertDegreesToRadian(151.264239);
+// This is another riders position defined as the same struct type
+double lat_me_rad = convertDegreesToRadian(-33.870162);
+double long_me_rad = convertDegreesToRadian(151.264249);
 
-    //*************************
-    // S E T U P
-    //*************************
-    void setup() {
-      // Set up the program in stages based on atomised code chunks
-      setupSerial();
-      setupGPS();
-      setupNRF();
-      setupAccelerometer();
+//*************************
+// S E T U P
+//*************************
+void setup() {
+  // Set up the program in stages based on atomised code chunks
+  setupSerial();
+  setupGPS();
+  setupNRF();
+  setupAccelerometer();
 }
 
 void setupSerial() {
   // Tis function will be used to set any variable, pins or modes
   // required to set up the Serial Communications
-  Serial.begin (9600);
+  Serial.begin(9600);
   return;
 }
 void setupGPS() {
@@ -57,23 +58,28 @@ void setupNRF() {
   // required to set up the NRF
   return;
 }
-void setupAccelerometer() { 
-    // Tis function will be used to set any variable, pins or modes
-    // required to set up the accelerometer
-    return; 
+void setupAccelerometer() {
+  // Tis function will be used to set any variable, pins or modes
+  // required to set up the accelerometer
+  return;
 }
 
 //*************************
 // L O O P
 //*************************
 void loop() {
-    read_sensors_to_get_self();
-    // broadcast_self_data_to_other_bikes()
-    read_other_bike_positions();
+  read_sensors_to_get_self();
+  // broadcast_self_data_to_other_bikes()
+  read_other_bike_positions();
 
-    calculateRiderGap(self, peloton[0]);
+  for (int loop = 0; loop < MAX_PELOTON; loop++) {
+    // variable defined here are only valid for each pass through the loop
+    double gap;
+    gap = calculateRiderGap(self, peloton[loop]);
+    update_output(loop, gap);
+  }
 
-    delay(PAUSE_FOR_LOOP);
+  delay(PAUSE_FOR_LOOP);
 }
 
 // _______ HELPERS ___________
@@ -97,34 +103,46 @@ double calculateRiderGap(Rider me, Rider them) {
   return D;
 }
 
-void read_sensors_to_get_self(){
-    // Ordinarily we would get a lot of this data from various sensor calls.
-    // However now we will just set a specific set of values.
-    self.latitude = -33.870162;
-    self.longitude = 151.264249; 
-    self.elevation = 19;
-    self.heading = 0;
-    self.speed = 0;
-    self.accel_x = 0;
-    self.accel_y = 0;
-    self.is_swerving = false;
-    self.is_breaking = false;
-    self.name = "Self";
-    return;
+void read_sensors_to_get_self() {
+  // Ordinarily we would get a lot of this data from various sensor calls.
+  // However now we will just set a specific set of values.
+  self.latitude = -33.870162;
+  self.longitude = 151.264249;
+  self.elevation = 19;
+  self.heading = 0;
+  self.speed = 0;
+  self.accel_x = 0;
+  self.accel_y = 0;
+  self.is_swerving = false;
+  self.is_breaking = false;
+  self.name = "Self";
+  return;
 }
 
-void read_other_bike_positions(){
-    for (int loop=0; loop < MAX_PELOTON; loop++){
-        String label = "pel_";
-        peloton[loop].latitude = -33.870768;
-        peloton[loop].longitude = 151.264239;
-        peloton[loop].elevation = 19;
-        peloton[loop].heading = 0;
-        peloton[loop].speed = 0;
-        peloton[loop].accel_x = 0;
-        peloton[loop].accel_y = 0;
-        peloton[loop].is_swerving = false;
-        peloton[loop].is_breaking = false;
-        peloton[loop].name = label.concat(String(loop));
-    }
+void read_other_bike_positions() {
+  // We are going to be using data that the bikes pass around to update
+  // information for each bike as it is received
+  // but for now, just loop through the peloton
+  // and set them all to the same thing
+  for (int loop = 0; loop < MAX_PELOTON; loop++) {
+    String label = "pel_";
+    peloton[loop].latitude = -33.870768;
+    peloton[loop].longitude = 151.264239;
+    peloton[loop].elevation = 19;
+    peloton[loop].heading = 0;
+    peloton[loop].speed = 0;
+    peloton[loop].accel_x = 0;
+    peloton[loop].accel_y = 0;
+    peloton[loop].is_swerving = false;
+    peloton[loop].is_breaking = false;
+    peloton[loop].name = label.concat(String(loop));
+  }
+}
+
+void update_output(int count, double value) {
+  Serial.print("Gap to rider ");
+  Serial.print(String(count));
+  Serial.print(" is ");
+  Serial.print(value);
+  Serial.println("m");
 }

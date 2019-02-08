@@ -2,7 +2,7 @@
 
 #define DEG_2_RAD 180/M_PI
 #define GLOBAL_RADIUS 6371000
-#define PAUSE_FOR_LOOP 100
+#define PAUSE_FOR_LOOP 1000
 #define MAX_PELOTON 4
 
 // Define the Rider structure to hold a consistent set of information
