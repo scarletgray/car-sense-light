@@ -5,6 +5,9 @@
 #define PAUSE_FOR_LOOP 1000
 #define MAX_PELOTON 4
 
+#define BRAKE_THRESHOLD 234
+#define SWERVE_THRESHOLD 654
+
 // Define the Rider structure to hold a consistent set of information
 struct Rider {
     double latitude;
@@ -17,4 +20,5 @@ struct Rider {
     bool is_swerving = false;
     bool is_breaking = false;
     String name = "none";
+    String address = "000001";
 };
