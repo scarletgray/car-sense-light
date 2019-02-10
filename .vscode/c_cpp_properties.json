@@ -7,9 +7,9 @@
             "includePath": [
                 "/Users/pkalt/.platformio/packages/framework-arduinoavr/cores/arduino",
                 "/Users/pkalt/.platformio/packages/framework-arduinoavr/variants/standard",
+                "/Users/pkalt/Documents/Arduino/libraries/ArduinoJson_ID64/src",
                 "/Users/pkalt/Documents/Arduino/libraries/Adafruit GFX Library_ID13",
                 "/Users/pkalt/Documents/Arduino/libraries/Adafruit_Sensor-master",
-                "/Users/pkalt/Documents/Arduino/libraries/ArduinoJson_ID64/src",
                 "/Users/pkalt/Documents/Arduino/libraries/ArduinoMQTT-master",
                 "/Users/pkalt/Documents/Arduino/libraries/ArduinoMQTT-master/utility",
                 "/Users/pkalt/Documents/Arduino/libraries/ArduinoMqtt_ID1390/src",
@@ -70,9 +70,9 @@
                 "path": [
                     "/Users/pkalt/.platformio/packages/framework-arduinoavr/cores/arduino",
                     "/Users/pkalt/.platformio/packages/framework-arduinoavr/variants/standard",
+                    "/Users/pkalt/Documents/Arduino/libraries/ArduinoJson_ID64/src",
                     "/Users/pkalt/Documents/Arduino/libraries/Adafruit GFX Library_ID13",
                     "/Users/pkalt/Documents/Arduino/libraries/Adafruit_Sensor-master",
-                    "/Users/pkalt/Documents/Arduino/libraries/ArduinoJson_ID64/src",
                     "/Users/pkalt/Documents/Arduino/libraries/ArduinoMQTT-master",
                     "/Users/pkalt/Documents/Arduino/libraries/ArduinoMQTT-master/utility",
                     "/Users/pkalt/Documents/Arduino/libraries/ArduinoMqtt_ID1390/src",
