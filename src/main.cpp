@@ -18,10 +18,10 @@ void read_sensors_to_get_self();
 void read_other_bike_positions();
 void output_distance(int, double);
 void broadcast_self_data_to_other_bikes();
-void send_rider_json(Rider, String);
+void nrf_send_json(String, String);
 String create_rider_json(Rider, bool);
 void output_rider(Rider);
-String nrf_read_data_channel(byte[]);
+String nrf_read_data_channel(String);
 
     // _______ GLOBAL VARIABLES _________
     // Global variables are ones you want to be able to use through every
@@ -136,72 +136,45 @@ double calculateRiderGap(Rider me, Rider them) {
   return D;
 }
 
-void read_sensors_to_get_self() {
-  // Ordinarily we would get a lot of this data from various sensor calls.
-  // However now we will just set a specific set of values.
+// _________ JSON ___________
+void load_json_to_rider(Rider rider, String json_in) {
+  // This function takes a Rider struct and q JSON formatted string
+  // It then breaks the JSON up by keys and inserts the values
+  // into the passed Rider struct
 
-  // From GPS
-  self.latitude = -33.870162;
-  self.longitude = 151.264249;
-  self.elevation = 19;
+  DynamicJsonBuffer serial_json_buffer;
+  JsonObject &json_root = serial_json_buffer.parseObject(json_in);
+  if (json_root.success()) {
+    JsonVariant latitude_json = json_root[F("latitude")];
+    if (latitude_json.success()) rider.latitude = latitude_json.as<double>();
+    JsonVariant longitude_json = json_root[F("longitude")];
+    if (longitude_json.success()) rider.longitude = longitude_json.as<double>();
+    JsonVariant elevation_json = json_root[F("elevation")];
+    if (elevation_json.success()) rider.elevation = elevation_json.as<double>();
+    JsonVariant heading_json = json_root[F("heading")];
+    if (heading_json.success()) rider.heading = heading_json.as<double>();
+    JsonVariant speed_json = json_root[F("speed")];
+    if (speed_json.success()) rider.speed = speed_json.as<double>();
+    JsonVariant accel_x_json = json_root[F("accel_x")];
+    if (accel_x_json.success()) rider.accel_x = accel_x_json.as<double>();
+    JsonVariant accel_y_json = json_root[F("accel_y")];
+    if (accel_y_json.success()) rider.accel_y = accel_y_json.as<double>();
+    JsonVariant is_swerving_json = json_root[F("is_swerving")];
+    if (is_swerving_json.success())
+      rider.is_swerving = is_swerving_json.as<bool>();
+    JsonVariant is_breaking_json = json_root[F("is_breaking")];
+    if (is_breaking_json.success())
+      rider.is_breaking = is_breaking_json.as<bool>();
+    JsonVariant name_json = json_root[F("name")];
+    if (name_json.success()) rider.name = name_json.as<String>();
+    JsonVariant address_json = json_root[F("address")];
+    if (address_json.success()) rider.address = address_json.as<String>();
+  }
 
-  // From GPS or accel based compass
-  self.heading = 0;
-  self.speed = 0;
-
-  // from accelerometer
-  self.accel_x = 0;
-  self.accel_y = 0;
-
-  // derived from accel data and THRESHOLDs in main.h
-  self.is_swerving = false;
-  self.is_breaking = false;
-  self.name = "Self";
   return;
 }
 
-void read_other_bike_positions() {
-  // We are going to be using data that the bikes pass around to update
-  // information for each bike as it is received as JSON string
-  for (int loop = 0; loop < MAX_PELOTON; loop++) {
-    // TODO: for each rider in peloton
-    // first get its address from the struct
-    // address = peloton[loop].address
-    // then read the NRF channel for that address until you get its JSON
-    // String read_json = nrf_read_data_channel(address);
-    // then parse that JSON into the peloton Rider array.
-    // load_json_to_rider(peloton[loop], read_json);
-
-    // but for now, just loop through the peloton
-    // and set them all to the same thing
-    String label = "pel_";
-    peloton[loop].name = label.concat(String(loop));
-    peloton[loop].latitude = -33.870768;
-    peloton[loop].longitude = 151.264239;
-    peloton[loop].elevation = 19;
-    peloton[loop].heading = 0;
-    peloton[loop].speed = 0;
-    peloton[loop].accel_x = 0;
-    peloton[loop].accel_y = 0;
-    peloton[loop].is_swerving = false;
-    peloton[loop].is_breaking = false;
-    // TODO : have a think about what other quantities
-    //        might need to go into Rider struct
-  }
-}
-
-
-void broadcast_self_data_to_other_bikes(){
-  // turn Rider self into JSON packet
-  // and then broadcast that information to each bike in peloton
-  String self_as_json = create_rider_json(self, false);
-  for (int loop=0; loop< MAX_PELOTON; loop++){
-    send_rider_json(peloton[loop], self_as_json);
-  }
-  return;
-}
-
-String create_rider_json(Rider rider, bool pretty){
+String create_rider_json(Rider rider, bool pretty) {
   // this function needs to build a JSON formated String
   // with our representation of the Rider struct
   // input: Rider rider  - the rider to be turned into JSON
@@ -235,45 +208,93 @@ String create_rider_json(Rider rider, bool pretty){
   return result;
 }
 
-void send_rider_json(Rider destination, String message){
-  // This uses the passed destination Rider struct to 
-  // get the target bike address or name
-  // and then send the message String to that address via NRF
+// _______ SENSORS ________
+void read_sensors_to_get_self() {
+  // Ordinarily we would get a lot of this data from various sensor calls.
+  // However now we will just set a specific set of values.
+
+  // From GPS
+  self.latitude = -33.870162;
+  self.longitude = 151.264249;
+  self.elevation = 19;
+
+  // From GPS or accel based compass
+  self.heading = 0;
+  self.speed = 0;
+
+  // from accelerometer
+  self.accel_x = 0;
+  self.accel_y = 0;
+
+  // derived from accel data and THRESHOLDs in main.h
+  self.is_swerving = false;
+  self.is_breaking = false;
+  self.name = "Self";
+  return;
+}
+
+void read_other_bike_positions() {
+  // We are going to be using data that the bikes pass around to update
+  // information for each bike as it is received as JSON string
+  // Get the information for each bike in turn
+  for (int loop = 0; loop < MAX_PELOTON; loop++) {
+    // first get its address from the struct
+    String address = peloton[loop].address;
+    // then read the NRF channel for that address until you get its JSON
+    String read_json = nrf_read_data_channel(address);
+    // then parse that JSON into the peloton Rider array.
+    load_json_to_rider(peloton[loop], read_json);
+
+    // but for now, just loop through the peloton
+    // and set them all to the same thing
+    String label = "pel_";
+    peloton[loop].name = label.concat(String(loop));   // pel_1, pel_2, etc.
+    peloton[loop].address = "000001";
+    peloton[loop].latitude = -33.870768;
+    peloton[loop].longitude = 151.264239;
+    peloton[loop].elevation = 19;
+    peloton[loop].heading = 0;
+    peloton[loop].speed = 0;
+    peloton[loop].accel_x = 0;
+    peloton[loop].accel_y = 0;
+    peloton[loop].is_swerving = false;
+    peloton[loop].is_breaking = false;
+
+    // TODO : have a think about what other quantities
+    //        might need to go into Rider struct
+  }
+}
+
+
+void broadcast_self_data_to_other_bikes(){
+  // turn Rider self into JSON packet
+  // and then broadcast that information to each bike in peloton
+  String self_as_json = create_rider_json(self, false);
+  for (int loop=0; loop< MAX_PELOTON; loop++){
+    nrf_send_json(peloton[loop].address, self_as_json);
+  }
+  return;
+}
+
+// __________NRF_____________
+void nrf_send_json(String address, String message) {
+  // This function takes the String it is passed
+  // turns it into byte[6] or whatever NRF code needs as address
+  // turns off the listener for that channel and blasts the message string
+  // via NRF
 
   // TODO: all of it.
   return;
 }
 
-void load_json_to_rider(Rider rider, String json_in){
-  // This function takes a Rider struct and q JSON formatted string
-  // It then breaks the JSON up by keys and inserts the values
-  // into the passed Rider struct
-  DynamicJsonBuffer serial_json_buffer;
-  JsonObject &json_root = serial_json_buffer.parseObject(json_in);
-  if (json_root.success()){
-    JsonVariant latitude_json = json_root[F("latitude")];
-    if (latitude_json.success()) rider.latitude= latitude_json.as<double>();
-    JsonVariant longitude_json = json_root[F("longitude")];
-    if (longitude_json.success()) rider.longitude= longitude_json.as<double>();
-    JsonVariant elevation_json = json_root[F("elevation")];
-    if (elevation_json.success()) rider.elevation= elevation_json.as<double>();
-    JsonVariant heading_json = json_root[F("heading")];
-    if (heading_json.success()) rider.heading= heading_json.as<double>();
-    JsonVariant speed_json = json_root[F("speed")];
-    if (speed_json.success()) rider.speed= speed_json.as<double>();
-    JsonVariant accel_x_json = json_root[F("accel_x")];
-    if (accel_x_json.success()) rider.accel_x= accel_x_json.as<double>();
-    JsonVariant accel_y_json = json_root[F("accel_y")];
-    if (accel_y_json.success()) rider.accel_y= accel_y_json.as<double>();
-    JsonVariant is_swerving_json = json_root[F("is_swerving")];
-    if (is_swerving_json.success()) rider.is_swerving= is_swerving_json.as<bool>();
-    JsonVariant is_breaking_json = json_root[F("is_breaking")];
-    if (is_breaking_json.success()) rider.is_breaking= is_breaking_json.as<bool>();
-    JsonVariant name_json = json_root[F("name")];
-    if (name_json.success()) rider.name= name_json.as<String>();
-    JsonVariant address_json = json_root[F("address")];
-    if (address_json.success()) rider.address= address_json.as<String>();
-  }
+String nrf_read_data_channel(String address){
+  // This function takes the String it is passed
+  // turns it into byte[6] or whatever NRF code needs as address
+  // sets the listeners for that channel
+  // waits for DATA on that channel and reads it when it comes
+  // returns DATA
 
-  return;
+  // TODO: all of it.
+  String result = "{}";
+  return result;
 }

@@ -20,5 +20,5 @@ struct Rider {
     bool is_swerving = false;
     bool is_breaking = false;
     String name = "none";
-    String address = "000001";
+    String address = "00001";
 };
