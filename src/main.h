@@ -8,17 +8,19 @@
 #define BRAKE_THRESHOLD 234
 #define SWERVE_THRESHOLD 654
 
+#define NRF_TIMEOUT 1000
+#define NRF_ADDRESS 00065
+
 // Define the Rider structure to hold a consistent set of information
 struct Rider {
     double latitude;
     double longitude;
-    double elevation = 0;
-    double heading = 0;
-    double speed = 0;
-    double accel_x = 0;
-    double accel_y = 0;
-    bool is_swerving = false;
-    bool is_breaking = false;
-    String name = "none";
-    String address = "00001";
+    double elevation;
+    double heading;
+    double speed;
+    double accel_x;
+    double accel_y;
+    bool is_swerving;
+    bool is_breaking;
+    int address;
 };

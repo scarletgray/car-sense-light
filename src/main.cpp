@@ -12,16 +12,17 @@ double deg2rad(double);
 void setupSerial();
 void setupGPS();
 void setupNRF();
+void setupLED();
 void setupAccelerometer();
 double calculateRiderGap(Rider, Rider);
 void read_sensors_to_get_self();
-void read_other_bike_positions();
+void read_other_bike_data();
 void output_distance(int, double);
 void broadcast_self_data_to_other_bikes();
-void nrf_send_json(String, String);
-String create_rider_json(Rider, bool);
+void nrf_send_json(int, String);
+String dump_rider_to_json(Rider, bool);
 void output_rider(Rider);
-String nrf_read_data_channel(String);
+String nrf_read_data_channel(int);
 
     // _______ GLOBAL VARIABLES _________
     // Global variables are ones you want to be able to use through every
@@ -38,8 +39,8 @@ void setup() {
   setupGPS();
   setupNRF();
   setupAccelerometer();
+  setupLED();
 }
-
 void setupSerial() {
   // This function will be used to set any variable, pins or modes
   // required to set up the Serial Communications
@@ -68,6 +69,13 @@ void setupAccelerometer() {
   // TODO: eveything
   return;
 }
+void setupLED() {
+  // This function will be used to set any variable, pins or modes
+  // required to set up the LED screen
+
+  // TODO: eveything
+  return;
+}
 
 //*************************
 // L O O P
@@ -76,22 +84,27 @@ void loop() {
   // DATA HANDLING/INPUT
   read_sensors_to_get_self();
   broadcast_self_data_to_other_bikes();
-  read_other_bike_positions();
+  read_other_bike_data();
 
-  // DATA PROCESSING
+  // DATA PROCESSING (BLACK BOX OF LOGIC)
   for (int loop = 0; loop < MAX_PELOTON; loop++) {
     // variable defined here are only valid for each pass through the loop
-    double gap;
-    gap = calculateRiderGap(self, peloton[loop]);
-    output_distance(loop, gap);
+    // double gap;
+    // gap = calculateRiderGap(self, peloton[loop]);
+    // output_distance(loop, gap);
+    output_rider(peloton[loop]);
   }
 
   //DATA OUTPUT
+  Serial.println("----------------");
 
-  // OTHER
+  // HOUSEKEEPING
   delay(PAUSE_FOR_LOOP);
 }
 
+//*************************
+// F U N C T I O N S
+//*************************
 // _______ OUTPUT ___________
 void output_distance(int count, double value) {
   // Simple function to format [rider, distance] for printing
@@ -104,41 +117,14 @@ void output_distance(int count, double value) {
 
 void output_rider(Rider rider) {
   // print the rider JSON out to serial output
-  String output = create_rider_json(rider, true);
+  String output = dump_rider_to_json(rider, true);
   Serial.print(output);
   return;
 }
 
-// _______ HELPERS ___________
-// Helper functions sit at the end
-double deg2rad(double degrees) {
-  // This function coverts degrees to radians as type double
-  double radians = (degrees * M_PI) / 180;
-  return radians;
-}
-
-double calculateRiderGap(Rider me, Rider them) {
-  // this function is passed 2 Rider structs
-  // It uses the latitude and longitude data therein
-  // to determine linear distance based on calculations from
-  // [ref:]  http://what_is_that_website?.com
-
-  double delta_lat = (deg2rad(them.latitude) - deg2rad(me.latitude));
-  double delta_long = (deg2rad(them.longitude) - deg2rad(me.longitude));
-
-  double A = (sin(delta_lat / 2) * sin(delta_lat / 2)) +
-             (cos(deg2rad(me.latitude)) * cos(deg2rad(them.latitude)) * sin(delta_long / 2) *
-              sin(delta_long / 2));
-
-  double C = 2 * atan2(sqrt(A), sqrt(1 - A));
-  double D = GLOBAL_RADIUS * C;
-
-  return D;
-}
-
 // _________ JSON ___________
 void load_json_to_rider(Rider rider, String json_in) {
-  // This function takes a Rider struct and q JSON formatted string
+  // This function takes a Rider struct and a JSON formatted string
   // It then breaks the JSON up by keys and inserts the values
   // into the passed Rider struct
 
@@ -165,16 +151,15 @@ void load_json_to_rider(Rider rider, String json_in) {
     JsonVariant is_breaking_json = json_root[F("is_breaking")];
     if (is_breaking_json.success())
       rider.is_breaking = is_breaking_json.as<bool>();
-    JsonVariant name_json = json_root[F("name")];
-    if (name_json.success()) rider.name = name_json.as<String>();
     JsonVariant address_json = json_root[F("address")];
-    if (address_json.success()) rider.address = address_json.as<String>();
+    if (address_json.success()) rider.address = address_json.as<int>();
+  } else {
+    Serial.println("ERROR loading JSON to rider");
   }
-
   return;
 }
 
-String create_rider_json(Rider rider, bool pretty) {
+String dump_rider_to_json(Rider rider, bool pretty) {
   // this function needs to build a JSON formated String
   // with our representation of the Rider struct
   // input: Rider rider  - the rider to be turned into JSON
@@ -196,7 +181,6 @@ String create_rider_json(Rider rider, bool pretty) {
   root[F("accel_y")] = rider.accel_y;
   root[F("is_swerving")] = rider.is_swerving;
   root[F("is_breaking")] = rider.is_breaking;
-  root[F("name")] = rider.name;
   root[F("address")] = rider.address;
 
   // create the String
@@ -216,7 +200,7 @@ void read_sensors_to_get_self() {
   // From GPS
   self.latitude = -33.870162;
   self.longitude = 151.264249;
-  self.elevation = 19;
+  self.elevation = 21;
 
   // From GPS or accel based compass
   self.heading = 0;
@@ -229,17 +213,28 @@ void read_sensors_to_get_self() {
   // derived from accel data and THRESHOLDs in main.h
   self.is_swerving = false;
   self.is_breaking = false;
-  self.name = "Self";
+  self.address = NRF_ADDRESS;
   return;
 }
 
-void read_other_bike_positions() {
-  // We are going to be using data that the bikes pass around to update
+// __________NRF/ COMMS _____________
+void broadcast_self_data_to_other_bikes() {
+  // turn Rider self into JSON packet
+  // and then broadcast that information to each bike in peloton
+  String self_as_json = dump_rider_to_json(self, false);
+  for (int loop = 0; loop < MAX_PELOTON; loop++) {
+    nrf_send_json(peloton[loop].address, self_as_json);
+  }
+  return;
+}
+
+void read_other_bike_data() {
+  // You are going to be using data that the bikes pass around to update
   // information for each bike as it is received as JSON string
   // Get the information for each bike in turn
   for (int loop = 0; loop < MAX_PELOTON; loop++) {
     // first get its address from the struct
-    String address = peloton[loop].address;
+    int address = peloton[loop].address;
     // then read the NRF channel for that address until you get its JSON
     String read_json = nrf_read_data_channel(address);
     // then parse that JSON into the peloton Rider array.
@@ -247,13 +242,13 @@ void read_other_bike_positions() {
 
     // but for now, just loop through the peloton
     // and set them all to the same thing
-    String label = "pel_";
-    peloton[loop].name = label.concat(String(loop));   // pel_1, pel_2, etc.
-    peloton[loop].address = "000001";
+    String label;
+    peloton[loop].address = loop;
     peloton[loop].latitude = -33.870768;
     peloton[loop].longitude = 151.264239;
-    peloton[loop].elevation = 19;
+    peloton[loop].elevation = 17;
     peloton[loop].heading = 0;
+  
     peloton[loop].speed = 0;
     peloton[loop].accel_x = 0;
     peloton[loop].accel_y = 0;
@@ -265,19 +260,7 @@ void read_other_bike_positions() {
   }
 }
 
-
-void broadcast_self_data_to_other_bikes(){
-  // turn Rider self into JSON packet
-  // and then broadcast that information to each bike in peloton
-  String self_as_json = create_rider_json(self, false);
-  for (int loop=0; loop< MAX_PELOTON; loop++){
-    nrf_send_json(peloton[loop].address, self_as_json);
-  }
-  return;
-}
-
-// __________NRF_____________
-void nrf_send_json(String address, String message) {
+void nrf_send_json(int address, String message) {
   // This function takes the String it is passed
   // turns it into byte[6] or whatever NRF code needs as address
   // turns off the listener for that channel and blasts the message string
@@ -287,14 +270,44 @@ void nrf_send_json(String address, String message) {
   return;
 }
 
-String nrf_read_data_channel(String address){
+String nrf_read_data_channel(int address){
   // This function takes the String it is passed
   // turns it into byte[6] or whatever NRF code needs as address
   // sets the listeners for that channel
   // waits for DATA on that channel and reads it when it comes
   // returns DATA
 
+  // NB: It is important that any while loop waiting for signal
+  //     times out if waiting too long > NRF_TIMEOUT
+
   // TODO: all of it.
   String result = "{}";
   return result;
+}
+
+// _______ HELPERS ___________
+// Helper functions sit at the end
+double deg2rad(double degrees) {
+  // This function coverts degrees to radians as type double
+  double radians = (degrees * M_PI) / 180;
+  return radians;
+}
+
+double calculateRiderGap(Rider me, Rider them) {
+  // this function is passed 2 Rider structs
+  // It uses the latitude and longitude data therein
+  // to determine linear distance based on calculations from
+  // [ref:]  http://what_is_that_website?.com
+
+  double delta_lat = (deg2rad(them.latitude) - deg2rad(me.latitude));
+  double delta_long = (deg2rad(them.longitude) - deg2rad(me.longitude));
+
+  double A = (sin(delta_lat / 2) * sin(delta_lat / 2)) +
+             (cos(deg2rad(me.latitude)) * cos(deg2rad(them.latitude)) *
+              sin(delta_long / 2) * sin(delta_long / 2));
+
+  double C = 2 * atan2(sqrt(A), sqrt(1 - A));
+  double D = GLOBAL_RADIUS * C;
+
+  return D;
 }
