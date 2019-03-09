@@ -259,7 +259,9 @@ void read_other_bike_data() {
     //        might need to go into Rider struct
   }
 }
-
+void flip (){
+  return;
+}
 void nrf_send_json(int address, String message) {
   // This function takes the String it is passed
   // turns it into byte[6] or whatever NRF code needs as address
