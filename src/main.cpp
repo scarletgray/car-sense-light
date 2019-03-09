@@ -24,10 +24,10 @@ String dump_rider_to_json(Rider, bool);
 void output_rider(Rider);
 String nrf_read_data_channel(int);
 
-    // _______ GLOBAL VARIABLES _________
-    // Global variables are ones you want to be able to use through every
-    // function. There should only ever need to be a few
-    Rider self;
+// _______ GLOBAL VARIABLES _________
+// Global variables are ones you want to be able to use through every
+// function. There should only ever need to be a few
+Rider self;
 Rider peloton[MAX_PELOTON];
 
 //*************************
