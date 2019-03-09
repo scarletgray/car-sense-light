@@ -18,7 +18,7 @@
 
 // void setup() {
 //   // put your setup code here, to run once:
-// i am ruprickt the monkeyboy Serial.begin (9600) ;
+//  Serial.begin (9600) ;
 
 // }
 
