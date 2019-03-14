@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Math.h>
+#include <RF24.h>
+#include <SPI.h>
+#include <nRF24L01.h>
 
 #include "main.h"
 
@@ -19,7 +22,7 @@ void read_sensors_to_get_self();
 void read_other_bike_data();
 void output_distance(int, double);
 void broadcast_self_data_to_other_bikes();
-void nrf_send_json(int, String);
+void nrf_send_json(const byte *, String);
 String dump_rider_to_json(Rider, bool);
 void output_rider(Rider);
 String nrf_read_data_channel(int);
@@ -29,6 +32,9 @@ String nrf_read_data_channel(int);
 // function. There should only ever need to be a few
 Rider self;
 Rider peloton[MAX_PELOTON];
+
+RF24 radio(7, 8);  // CE, CSN
+const byte addresses[][6] = {"00001", "00002"};
 
 //*************************
 // S E T U P
@@ -59,7 +65,10 @@ void setupNRF() {
   // This function will be used to set any variable, pins or modes
   // required to set up the NRF
 
-  // TODO: eveything
+  radio.begin();
+  // radio.openWritingPipe(addresses[1]);     // 00001
+  // radio.openReadingPipe(1, addresses[0]);  // 00002
+  radio.setPALevel(RF24_PA_MIN);
   return;
 }
 void setupAccelerometer() {
@@ -260,13 +269,15 @@ void read_other_bike_data() {
   }
 }
 
-void nrf_send_json(int address, String message) {
+void nrf_send_json(const byte *address, String message) {
   // This function takes the String it is passed
   // turns it into byte[6] or whatever NRF code needs as address
   // turns off the listener for that channel and blasts the message string
   // via NRF
 
-  // TODO: all of it.
+  radio.stopListening();
+  radio.openWritingPipe(address);
+  radio.write(&message, sizeof(message));
   return;
 }
 
