@@ -4,16 +4,17 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:\\Users\\escarletg\\OneDrive - SCEGGS DARLINGHURST\\Arduino\\tools\\**",
-                "C:\\Users\\escarletg\\OneDrive - SCEGGS DARLINGHURST\\Arduino\\hardware\\arduino\\avr\\**",
                 "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/cores/arduino",
                 "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/variants/standard",
+                "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/ArduinoJson_ID64/src",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/accelerometeralone",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/joyledtransmitterhtmech",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/src",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/include",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/transmitterhowtomech",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/working2ultalcd",
+                "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/RF24_ID433",
+                "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/RF24_ID433/utility",
                 "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src",
                 "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/HID/src",
                 "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SPI/src",
@@ -30,12 +31,15 @@
                 "path": [
                     "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/cores/arduino",
                     "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/variants/standard",
+                    "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/ArduinoJson_ID64/src",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/accelerometeralone",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/joyledtransmitterhtmech",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/src",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/include",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/transmitterhowtomech",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/working2ultalcd",
+                    "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/RF24_ID433",
+                    "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/RF24_ID433/utility",
                     "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/EEPROM/src",
                     "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/HID/src",
                     "C:/Users/escarletg/.platformio/packages/framework-arduinoavr/libraries/__cores__/arduino/SPI/src",
@@ -59,10 +63,7 @@
             "intelliSenseMode": "clang-x64",
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "compilerPath": "C:/Users/escarletg/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe -mmcu=atmega328p",
-            "forcedInclude": [
-                "C:\\Users\\escarletg\\OneDrive - SCEGGS DARLINGHURST\\Arduino\\hardware\\arduino\\avr\\cores\\arduino\\Arduino.h"
-            ]
+            "compilerPath": "C:/Users/escarletg/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe -mmcu=atmega328p"
         }
     ],
     "version": 4
