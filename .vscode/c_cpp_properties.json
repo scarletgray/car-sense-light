@@ -1,6 +1,8 @@
 {
-    "!!! WARNING !!!": "PLEASE DO NOT MODIFY THIS FILE! USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags",
     "configurations": [
+        {
+            "name": "!!! WARNING !!! AUTO-GENERATED FILE, PLEASE DO NOT MODIFY IT AND USE https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags"
+        },
         {
             "name": "Win32",
             "includePath": [
@@ -9,8 +11,8 @@
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/ArduinoJson_ID64/src",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/accelerometeralone",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/joyledtransmitterhtmech",
-                "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/src",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/include",
+                "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/src",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/transmitterhowtomech",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/working2ultalcd",
                 "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/RF24_ID433",
@@ -34,8 +36,8 @@
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/ArduinoJson_ID64/src",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/accelerometeralone",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/joyledtransmitterhtmech",
-                    "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/src",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/include",
+                    "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/pio-distmath/src",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/transmitterhowtomech",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/lib/working2ultalcd",
                     "c:/Users/escarletg/OneDrive - SCEGGS DARLINGHURST/_Year 12/Extension Science/Clones/car-sense-light/.piolibdeps/RF24_ID433",
@@ -52,7 +54,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=30604",
+                "PLATFORMIO=30607",
                 "ARDUINO_AVR_UNO",
                 "F_CPU=16000000L",
                 "ARDUINO_ARCH_AVR",
@@ -63,7 +65,7 @@
             "intelliSenseMode": "clang-x64",
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "compilerPath": "C:/Users/escarletg/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe -mmcu=atmega328p"
+            "compilerPath": "\"C:/Users/escarletg/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe\" -mmcu=atmega328p"
         }
     ],
     "version": 4
