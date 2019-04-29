@@ -52,6 +52,8 @@ void setupGPS() {
   // This function will be used to set any variable, pins or modes
   // required to set up the GPS
 
+  
+
   // TODO: eveything
   return;
 }
@@ -59,7 +61,12 @@ void setupNRF() {
   // This function will be used to set any variable, pins or modes
   // required to set up the NRF
 
-  // TODO: eveything
+  pinMode(3, OUTPUT);
+  radio.begin();
+  radio.openWritingPipe(addresses[1]); // 00001
+  radio.openReadingPipe(1, addresses[0]); // 00002
+  radio.setPALevel(RF24_PA_MIN);
+
   return;
 }
 void setupAccelerometer() {
@@ -69,9 +76,9 @@ void setupAccelerometer() {
   // TODO: eveything
   return;
 }
-void setupLED() {
+void setupLCD() {
   // This function will be used to set any variable, pins or modes
-  // required to set up the LED screen
+  // required to set up the LCD screen
 
   // TODO: eveything
   return;

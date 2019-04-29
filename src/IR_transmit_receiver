@@ -1,0 +1,35 @@
+#include <IRremote.h>
+
+int RECV_PIN = 11;
+int SEND_PIN = 3;
+
+IRsend irsend;
+IRrecv irrecv(RECV_PIN);
+
+decode_results results;
+
+void setup()
+{
+  Serial.begin(9600);
+  irrecv.enableIRIn(); //start receiver
+}
+
+void loop() {
+    if (irrecv.decode(&results)) {
+      Serial.println(results.value);
+      
+      if(results.value == 881415973){
+      Serial.println("heyo");
+      }
+      
+    if (digitalRead(7) == HIGH){
+      delay(50);
+      irsend.sendNEC(0x34895725, 32);}
+       
+
+		delay(1);
+		
+		irrecv.resume(); // Receive the next value
+  }
+  delay(100);
+}
