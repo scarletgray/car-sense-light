@@ -10,26 +10,36 @@ decode_results results;
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   irrecv.enableIRIn(); //start receiver
+//  irsend.enableIROut(); //start transmitter
 }
 
 void loop() {
-    if (irrecv.decode(&results)) {
-      Serial.println(results.value);
-      
-      if(results.value == 881415973){
-      Serial.println("heyo");
-      }
-      
-    if (digitalRead(7) == HIGH){
-      delay(50);
-      irsend.sendNEC(0x34895725, 32);}
-       
+  if (digitalRead(7) == HIGH){  //pressing button to send IR wave
+    irsend.sendSony(0xA90, 11);
+   // Serial.print("oui");  
+    //irsend.sendNEC(0x34895725, 32);}   //CHECK THESE VALUES!!
+ //   delay(1);
+   
+    }
+  
+  if (irrecv.decode(&results)) {
+    Serial.print("yes");
+    Serial.println(results.value, HEX);
+    irrecv.resume(); // Receive the next value
+    
 
-		delay(1);
-		
-		irrecv.resume(); // Receive the next value
+//  if (irrecv.decode(&results)) {
+ //   Serial.println(results.value);
+    
+ //   if(results.value == 0xA90){  //CHECK THIS VALUE!!
+ //     Serial.println("IR VALUE RECEIVED");
+ //     }
+//      delay(1);
+//      irrecv.resume(); // Receive the next value
+    }
+
   }
-  delay(100);
-}
+ // delay(100);
+//}
