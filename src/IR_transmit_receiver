@@ -1,45 +1,93 @@
+// pin constants:
+//GND - GND
+//VCC - 3.3V
+//AREF - 3.3v (shows REF on NANO)
+
 #include <IRremote.h>
 
+#define ALPHA_X           0.99
+#define ALPHA_Y           0.99
+#define BETA_X           0.99
+#define BETA_Y           0.99
+#define SAMPLING_PERIOD   100
+
+const int xPin = A5;                  // x-axis of the accelerometer
+const int yPin = A4;                  // y-axis
+const int zPin = A3;                  // z-axis
+
+IRsend irsend;
 int RECV_PIN = 11;
 int SEND_PIN = 3;
 
-IRsend irsend;
-IRrecv irrecv(RECV_PIN);
+unsigned int swervSignal[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
+unsigned int slowSignal[] =  {0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1};
 
-decode_results results;
-
-void setup()
-{
+void setup() {
+  // initialize the serial communications:
   Serial.begin(115200);
-  irrecv.enableIRIn(); //start receiver
-//  irsend.enableIROut(); //start transmitter
+
+  pinMode(A5, INPUT);
+  pinMode(A4, INPUT);
+  pinMode(A3, INPUT);
+
+  irsend.enableIROut(38);
+  
 }
 
 void loop() {
-  if (digitalRead(7) == HIGH){  //pressing button to send IR wave
-    irsend.sendSony(0xA90, 11);
-   // Serial.print("oui");  
-    //irsend.sendNEC(0x34895725, 32);}   //CHECK THESE VALUES!!
- //   delay(1);
+   static double smooth_x=0.0, smooth_y=0.0;
+   static double const_x=0.0, const_y=0.0;
+   static byte init_done = 0;
+
+   if(init_done == 0)
+   {
+    smooth_x=(analogRead(xPin));
+    smooth_y=(analogRead(yPin));
+    init_done = 1;
+   }
    
-    }
+  analogReference(EXTERNAL); //connect 3.3v to AREF
+  // print the sensor values:
+  // X Reading
+  int xValue = (analogRead(xPin));  //maybe later consider subtracting resting value e.g. 512
+ // Serial.print("X Value:");
+  //Serial.print(xValue);
+  //Serial.print(","); // if want to print a tab between values: "/t"
+  // Y Reading
+  int yValue = (analogRead(yPin));  // later - 516
+
+  smooth_x = ALPHA_X*smooth_x + (1.0-ALPHA_X)*((double)xValue);
+  smooth_y = ALPHA_Y*smooth_y + (1.0-ALPHA_Y)*((double)yValue);
+
+  const_x = BETA_X*const_x + (1.0-BETA_X)*((double)smooth_x); //lies around 552.8
+  const_y = BETA_Y*const_y + (1.0-BETA_Y)*((double)smooth_y); //lies around 520.4
+
+  //Serial.print("smooth_y: ");
+  Serial.print(smooth_y);
+  Serial.print(", ");
+  //Serial.print(const_y);
+  //Serial.print(", ");
+  Serial.print(yValue);
+  Serial.print(", ");
+
+  //Serial.print("smooth_x: ");
+  Serial.print(smooth_x);
+  Serial.print(", ");
+  //Serial.print(const_x);
+  //Serial.print(", ");
+  Serial.println(xValue);
+
   
-  if (irrecv.decode(&results)) {
-    Serial.print("yes");
-    Serial.println(results.value, HEX);
-    irrecv.resume(); // Receive the next value
+  if(smooth_y > 500)  
+    irsend.sendSony(0xFE0, 12);
     
+  delay(10);
 
-//  if (irrecv.decode(&results)) {
- //   Serial.println(results.value);
-    
- //   if(results.value == 0xA90){  //CHECK THIS VALUE!!
- //     Serial.println("IR VALUE RECEIVED");
- //     }
-//      delay(1);
-//      irrecv.resume(); // Receive the next value
-    }
+  //if(smooth_x > const_x)
+    //irsend.sendSony(0xAAA, 12);
 
-  }
- // delay(100);
-//}
+  delay(10);
+  
+  delay(SAMPLING_PERIOD);
+  
+}
